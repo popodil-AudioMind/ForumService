@@ -6,6 +6,7 @@ using Audiomind.RabbitMQ;
 using MassTransit.Transports;
 using MassTransit;
 using Audiomind.RabbitMQ.Moddels;
+using ForumService.Interfaces;
 
 namespace ForumService.Controllers
 {
@@ -61,8 +62,9 @@ namespace ForumService.Controllers
         }
 
         [HttpPatch("", Name = "Update"), Authorize]
-        public IActionResult Update(Forum forum)
+        public IActionResult Update(IForum iforum)
         {
+            Forum forum = new Forum(iforum);
             if (forum.id.ToString() == null || forum.id.ToString() == string.Empty) return BadRequest("Forum field can't be empty.");
             if (User.Claims.Contains(new System.Security.Claims.Claim("forums", forum.id.ToString())) || User.IsInRole("administrator"))
             {
