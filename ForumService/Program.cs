@@ -17,7 +17,7 @@ namespace ForumService
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                })
-                .AddDiscoveryClient();
+                });
+                //.AddDiscoveryClient();
     }
 }
