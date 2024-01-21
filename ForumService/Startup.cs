@@ -20,6 +20,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Prometheus;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Cassandra;
 
 namespace ForumService
 {
@@ -53,12 +55,34 @@ namespace ForumService
 
             //DbConfiguration.SetConfiguration(new MySqlEFConfiguration());
             string connectionstring;
-            if (_env.IsDevelopment()) connectionstring = Configuration.GetValue<string>("ConnectionStrings:DevConnection");
-            else connectionstring = Configuration.GetValue<string>("ConnectionStrings:DefaultConnection");
+            //if (_env.IsDevelopment()) connectionstring = Configuration.GetValue<string>("ConnectionStrings:DevConnection");
+            //else connectionstring = Configuration.GetValue<string>("ConnectionStrings:DefaultConnection");
+            connectionstring = Configuration.GetValue<string>("ConnectionStrings:DefaultConnection");
             try
             {
                 services.AddDbContextPool<ForumDatabaseContext>(
                     options => options.UseMySql(connectionstring.ToString(), ServerVersion.AutoDetect(connectionstring))
+                    /*options => options.UseCassandra("Contact Points=127.0.0.1;", "cv", opt =>
+                    {
+                        opt.MigrationsHistoryTable(HistoryRepository.DefaultTableName);
+                    }, o =>
+                    {
+
+                        o.WithQueryOptions(new QueryOptions().SetConsistencyLevel(ConsistencyLevel.LocalOne))
+                            .WithReconnectionPolicy(new ConstantReconnectionPolicy(1000))
+                            .WithRetryPolicy(new DefaultRetryPolicy())
+                            .WithLoadBalancingPolicy(new TokenAwarePolicy(Policies.DefaultPolicies.LoadBalancingPolicy))
+                            .WithDefaultKeyspace(GetType().Name)
+                            .WithPoolingOptions(
+                            PoolingOptions.Create()
+                                .SetMaxSimultaneousRequestsPerConnectionTreshold(HostDistance.Remote, 1_000_000)
+                                .SetMaxSimultaneousRequestsPerConnectionTreshold(HostDistance.Local, 1_000_000)
+                                .SetMaxConnectionsPerHost(HostDistance.Local, 1_000_000)
+                                .SetMaxConnectionsPerHost(HostDistance.Remote, 1_000_000)
+                                .SetMaxRequestsPerConnection(1_000_000)
+                        );
+                    }
+                    )*/
                 );
             }
             catch (Exception)
@@ -96,7 +120,8 @@ namespace ForumService
                 x.AddConsumer<DeleteConsumer>();
                 x.UsingRabbitMq((context, cfg) =>
                 {
-                    cfg.Host("rabbitmq", "/", h => {
+                    cfg.Host("rabbitmq", "/", h =>
+                    {
                         h.Username("guest");
                         h.Password("guest");
                     });
@@ -118,7 +143,7 @@ namespace ForumService
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            DatabaseManagementService.MigrationInitialisation(app);
+            //DatabaseManagementService.MigrationInitialisation(app);
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -127,7 +152,7 @@ namespace ForumService
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "RestAPI v1"));
 
 
-            app.UseRouting(); 
+            app.UseRouting();
             app.UseHttpMetrics();
 
             app.UseCors();
