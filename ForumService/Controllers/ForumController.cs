@@ -28,13 +28,13 @@ namespace ForumService.Controllers
         }
 
         [HttpPost("", Name = "Create"), Authorize]
-        public IActionResult Create(Forum forum)
+        public IActionResult Create(IForum forum)
         {
             if (forum == null) return BadRequest();
             else if (forum.title == null || forum.title == string.Empty) return BadRequest("Title can't be empty");
             else if (forum.description == null || forum.description == string.Empty) return BadRequest("Description can't be empty.");
 
-            Forum createdForum = _sqlForum.AddForum(forum);
+            Forum createdForum = _sqlForum.AddForum(new Forum(forum));
             if (createdForum == null) return BadRequest("Forum already exists!");
             _messagePublisher.SendMessage(new ForumMessage() { userId = createdForum.userId.ToString(), forumId = createdForum.id.ToString() }, _publishEndpoint);
             return Created("Forum database", createdForum);
