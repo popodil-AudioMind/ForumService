@@ -19,10 +19,10 @@ namespace ForumService.SQL
             if (existingForum == null)
             {
                 
-                while (id.ToString() == existingForum.id)
+                /*while (id.ToString() == existingForum.id)
                 {
                     id = Guid.NewGuid();
-                }
+                }*/
                 forum.id = id;
                 _forumContext.Forums.Add(new IForum(forum));
                 _forumContext.SaveChanges();
