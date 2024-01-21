@@ -54,7 +54,7 @@ namespace ForumService
             });
 
             //DbConfiguration.SetConfiguration(new MySqlEFConfiguration());
-            string connectionstring;
+            /*string connectionstring;
             //if (_env.IsDevelopment()) connectionstring = Configuration.GetValue<string>("ConnectionStrings:DevConnection");
             //else connectionstring = Configuration.GetValue<string>("ConnectionStrings:DefaultConnection");
             connectionstring = Configuration.GetValue<string>("ConnectionStrings:DefaultConnection");
@@ -62,7 +62,7 @@ namespace ForumService
             {
                 services.AddDbContextPool<ForumDatabaseContext>(
                     options => options.UseMySql(connectionstring.ToString(), ServerVersion.AutoDetect(connectionstring))
-                    /*options => options.UseCassandra("Contact Points=127.0.0.1;", "cv", opt =>
+                    *//*options => options.UseCassandra("Contact Points=127.0.0.1;", "cv", opt =>
                     {
                         opt.MigrationsHistoryTable(HistoryRepository.DefaultTableName);
                     }, o =>
@@ -82,13 +82,13 @@ namespace ForumService
                                 .SetMaxRequestsPerConnection(1_000_000)
                         );
                     }
-                    )*/
+                    )*//*
                 );
             }
             catch (Exception)
             {
                 throw;
-            }
+            }*/
 
             services.AddScoped<ISqlForum, SqlForum>();
             services.AddScoped<IMessageProducer, RabbitMQProducer>();
