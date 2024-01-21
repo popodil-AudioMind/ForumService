@@ -11,7 +11,7 @@ using ForumService.Interfaces;
 namespace ForumService.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class ForumController : ControllerBase
     {
         private ISqlForum _sqlForum;
